@@ -14,6 +14,7 @@ DATABASE_PATH = os.path.join("database", "database.db")
 conn = sqlite3.connect(DATABASE_PATH, check_same_thread=False)
 cursor = conn.cursor()
 
+
 class AddRepo(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
