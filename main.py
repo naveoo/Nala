@@ -24,7 +24,7 @@ async def on_ready():
         await bot.tree.sync()
         print(f"✅ Commandes slash synchronisées: {len(bot.tree.get_commands())}")
     except Exception as e:
-        print(f"❌ Erreur lors de la synchronisation des commandes : {e}")
+        print(f"❌ Erreur lors de la synchronisation des commandes : {e} ")
 
 @bot.event
 async def setup_hook():
