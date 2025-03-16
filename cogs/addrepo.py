@@ -5,6 +5,7 @@ import sqlite3
 import requests
 import os
 from dotenv import load_dotenv
+import secrets  # Import pour générer un secret unique
 
 # Charger les variables d'environnement
 load_dotenv()
@@ -13,7 +14,6 @@ load_dotenv()
 DATABASE_PATH = os.path.join("database", "database.db")
 conn = sqlite3.connect(DATABASE_PATH, check_same_thread=False)
 cursor = conn.cursor()
-
 
 class AddRepo(commands.Cog):
     def __init__(self, bot):
@@ -35,19 +35,18 @@ class AddRepo(commands.Cog):
 
                 # Vérifier si le dépôt existe
                 if self.check_repo_exists(repo_name, github_token):
-                    # Ajouter le dépôt à la table UserRepos
+                    # Générer un webhook secret unique pour ce dépôt
+                    webhook_secret = secrets.token_hex(16)  # Génère un secret hexadécimal de 16 octets
+
+                    # Ajouter le dépôt à la table UserRepos avec le webhook_secret
                     cursor.execute('''
-                    INSERT OR IGNORE INTO UserRepos (discord_id, repo_name)
-                    VALUES (?, ?)
-                    ''', (discord_id, repo_name))
+                    INSERT OR IGNORE INTO UserRepos (discord_id, repo_name, webhook_secret)
+                    VALUES (?, ?, ?)
+                    ''', (discord_id, repo_name, webhook_secret))
                     conn.commit()
 
                     if cursor.rowcount > 0:
-                        await interaction.response.send_message(f"Le dépôt `{repo_name}` a été ajouté à votre profil.", ephemeral=True)
-
-                        # Créer un webhook sur GitHub pour ce dépôt
-                        self.create_github_webhook(repo_name, github_token, discord_id)
-
+                        await interaction.response.send_message(f"Le dépôt `{repo_name}` a été ajouté à votre profil avec le secret du webhook.", ephemeral=True)
                     else:
                         await interaction.response.send_message(f"Vous suivez déjà le dépôt `{repo_name}`.", ephemeral=True)
                 else:
@@ -70,30 +69,6 @@ class AddRepo(commands.Cog):
         except Exception as e:
             print(f"Erreur lors de la vérification du dépôt : {e}")
             return False
-
-    def create_github_webhook(self, repo_name, github_token, discord_id):
-        webhook_url = f"http://ton-serveur.com/github_webhook?user_id={discord_id}&repo_name={repo_name}"
-
-        # Créer un webhook pour ce dépôt
-        url = f"https://api.github.com/repos/{repo_name}/hooks"
-        headers = {
-            "Authorization": f"token {github_token}",
-            "Accept": "application/vnd.github.v3+json"
-        }
-        payload = {
-            "config": {
-                "url": webhook_url,
-                "content_type": "json"
-            },
-            "events": ["push", "issues", "pull_request"],  # Événements à suivre
-            "active": True
-        }
-
-        response = requests.post(url, headers=headers, json=payload)
-        if response.status_code == 201:
-            print(f"✅ Webhook créé pour le dépôt {repo_name}")
-        else:
-            print(f"❌ Erreur lors de la création du webhook : {response.text}")
 
 async def setup(bot):
     await bot.add_cog(AddRepo(bot))
