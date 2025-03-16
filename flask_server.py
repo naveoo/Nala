@@ -4,6 +4,10 @@ from github_webhook import handle_github_webhook  # Importer la fonction du fich
 
 app = Flask(__name__)
 
+@app.route('/')
+def home():
+    return 'Page d\'accueil'
+
 @app.route("/callback")
 def callback():
     return handle_callback()  # Gestion du callback GitHub
