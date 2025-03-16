@@ -55,6 +55,17 @@ def create_github_webhook(github_token, repo_name):
 # Route pour recevoir les événements Webhook de GitHub
 @app.route("/github_webhook", methods=["POST"])
 def github_webhook():
+    print("Webhook reçu :", request.json)
+
+    if request.method == "POST":
+        # Traiter l'événement GitHub
+        event = request.headers.get("X-GitHub-Event")
+        if event == "push":
+            # Traite l'événement push
+            print("Événement push reçu.")
+        # Ajouter des logs supplémentaires pour vérifier la réception
+        return "", 200
+
     data = request.json
     event_type = request.headers.get("X-GitHub-Event")
     repository_name = data["repository"]["full_name"]

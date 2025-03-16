@@ -43,6 +43,10 @@ class AddRepo(commands.Cog):
 
                     if cursor.rowcount > 0:
                         await interaction.response.send_message(f"Le dépôt `{repo_name}` a été ajouté à votre profil.", ephemeral=True)
+
+                        # Créer un webhook sur GitHub pour ce dépôt
+                        self.create_github_webhook(repo_name, github_token, discord_id)
+
                     else:
                         await interaction.response.send_message(f"Vous suivez déjà le dépôt `{repo_name}`.", ephemeral=True)
                 else:
@@ -65,6 +69,30 @@ class AddRepo(commands.Cog):
         except Exception as e:
             print(f"Erreur lors de la vérification du dépôt : {e}")
             return False
+
+    def create_github_webhook(self, repo_name, github_token, discord_id):
+        webhook_url = f"http://ton-serveur.com/github_webhook?user_id={discord_id}&repo_name={repo_name}"
+
+        # Créer un webhook pour ce dépôt
+        url = f"https://api.github.com/repos/{repo_name}/hooks"
+        headers = {
+            "Authorization": f"token {github_token}",
+            "Accept": "application/vnd.github.v3+json"
+        }
+        payload = {
+            "config": {
+                "url": webhook_url,
+                "content_type": "json"
+            },
+            "events": ["push", "issues", "pull_request"],  # Événements à suivre
+            "active": True
+        }
+
+        response = requests.post(url, headers=headers, json=payload)
+        if response.status_code == 201:
+            print(f"✅ Webhook créé pour le dépôt {repo_name}")
+        else:
+            print(f"❌ Erreur lors de la création du webhook : {response.text}")
 
 async def setup(bot):
     await bot.add_cog(AddRepo(bot))
