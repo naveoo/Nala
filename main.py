@@ -2,7 +2,6 @@ import discord
 import os
 from discord.ext import commands
 from dotenv import load_dotenv
-import asyncio
 from threading import Thread
 from flask_server import app
 
@@ -34,11 +33,13 @@ async def setup_hook():
             await bot.load_extension(f"cogs.{filename[:-3]}")
     print(f"Commandes chargées : {[cmd.name for cmd in bot.tree.get_commands()]}")
 
-async def main():
+def run_discord_bot():
+    # Lancer le serveur Flask dans un thread séparé
     flask_thread = Thread(target=run_flask)
     flask_thread.start()
 
-    await bot.start(TOKEN)
+    # Lancer le bot Discord
+    bot.run(TOKEN)
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    run_discord_bot()
