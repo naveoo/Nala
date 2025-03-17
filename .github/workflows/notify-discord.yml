@@ -1,16 +1,14 @@
-name: Notify Discord
+name: Notify Discord on Commit
 on:
   push:
     branches:
-      - main  # Surveille les pushes sur la branche "main"
-  pull_request:
-    types: [opened, synchronize]  # Surveille les nouvelles pull requests et les mises à jour
+      - main
 jobs:
   notify:
-    runs-on: ubuntu-latest  # Utilise une machine virtuelle Ubuntu
+    runs-on: ubuntu-latest
     steps:
       - name: Send Discord Notification
-        uses: Ilshidur/action-discord@master  # Utilise une action existante pour Discord
+        uses: Ilshidur/action-discord@master
         with:
-          webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}  # Utilise le secret pour l'URL du webhook
-          message: "Nouvel événement sur le dépôt !"
+          webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          args: '{"content": "Nouveau commit sur **${{ github.repository }}** par **${{ github.actor }}** :\n- **Message** : ${{ github.event.head_commit.message }}\n- **Lien** : ${{ github.event.head_commit.url }}"}'
