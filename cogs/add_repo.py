@@ -39,9 +39,9 @@ class AddRepo(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @app_commands.command(name="addrepo", description="Ajoutez un dépôt GitHub à votre profil.")
+    @app_commands.command(name="add_repo", description="Ajoutez un dépôt GitHub à votre profil.")
     @app_commands.describe(repo_name="Nom du dépôt GitHub (format : owner/repo)", channel="Salon Discord pour les notifications")
-    async def addrepo(self, interaction: discord.Interaction, repo_name: str, channel: discord.TextChannel):
+    async def add_repo(self, interaction: discord.Interaction, repo_name: str, channel: discord.TextChannel):
         await interaction.response.defer(ephemeral=False)
         discord_id = str(interaction.user.id)
         try:
@@ -324,12 +324,6 @@ class AddRepo(commands.Cog):
                     "Une erreur inattendue s'est produite.",
                     ephemeral=True
                 )
-
-
-
-
-
-
             await interaction_button.response.send_message("Vous avez validé les étapes avec succès ! 🎉")
 
         button.callback = button_callback
