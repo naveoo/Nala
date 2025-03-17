@@ -32,7 +32,7 @@ def create_flask_app(bot):
         return response
 
     @app.route("/")
-    def home():
+    def home(): 
         return "Hello, world!"
 
     # Route pour gérer le callback GitHub OAuth
