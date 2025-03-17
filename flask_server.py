@@ -31,6 +31,10 @@ def create_flask_app(bot):
         response.headers["ngrok-skip-browser-warning"] = "true"
         return response
 
+    @app.route("/")
+    def home():
+        return "Hello, world!"
+
     # Route pour gérer le callback GitHub OAuth
     @app.route("/callback")
     def callback():

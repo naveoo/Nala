@@ -1,0 +1,16 @@
+name: Notify Discord
+on:
+  push:
+    branches:
+      - main  # Surveille les pushes sur la branche "main"
+  pull_request:
+    types: [opened, synchronize]  # Surveille les nouvelles pull requests et les mises à jour
+jobs:
+  notify:
+    runs-on: ubuntu-latest  # Utilise une machine virtuelle Ubuntu
+    steps:
+      - name: Send Discord Notification
+        uses: Ilshidur/action-discord@master  # Utilise une action existante pour Discord
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}  # Utilise le secret pour l'URL du webhook
+          message: "Nouvel événement sur le dépôt !"
