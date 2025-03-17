@@ -11,4 +11,8 @@ jobs:
         uses: Ilshidur/action-discord@master
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
+<<<<<<< HEAD
           args: '{"content": "Nouveau commit sur **${{ github.repository }}** par **${{ github.actor }}** :\n- **Message** : ${{ github.event.head_commit.message }}\n- **Lien** : ${{ github.event.head_commit.url }}"}'
+=======
+          args: '{"content": "Nouveau commit sur **${{ github.repository }}** par **${{ github.actor }}** :\n- **Message** : ${{ github.event.head_commit.message }}\n- **Lien** : ${{ github.event.head_commit.url }}"}'
+>>>>>>> 2c32d566d7ebadebaf4ec9d595e47facb4436df9
