@@ -63,36 +63,6 @@ def create_flask_app(bot):
 
         return "Authentification réussie ! Votre compte GitHub est maintenant lié."
 
-    # Route pour gérer les webhooks GitHub
-    @app.route('/github_webhook', methods=['POST'])
-    def github_webhook():
-        signature = request.headers.get('X-Hub-Signature-256')
-        payload = request.get_data()
-        repo_name = request.json['repository']['full_name']
-
-        cursor.execute('SELECT discord_id, webhook_secret FROM UserRepos WHERE repo_name = ?', (repo_name,))
-        result = cursor.fetchone()
-        if result:
-            discord_id, webhook_secret = result
-            if not verify_webhook_signature(webhook_secret, payload, signature):
-                return "Signature invalide", 403
-
-            event = request.headers.get('X-GitHub-Event')
-            if event == 'push':
-                commits = request.json['commits']
-                commit_messages = [commit['message'] for commit in commits]
-                message = f"🔔 Nouveau(s) commit(s) dans `{repo_name}`:\n" + "\n".join(commit_messages)
-            elif event == 'pull_request':
-                pr_action = request.json['action']
-                pr_title = request.json['pull_request']['title']
-                message = f"🔔 Pull Request dans `{repo_name}`: {pr_title} ({pr_action})"
-            else:
-                return "Événement non géré", 200
-
-            send_discord_dm(bot, discord_id, message)
-            return jsonify({"message": "Webhook reçu"}), 200
-        else:
-            return "Dépôt non trouvé", 404
 
     return app
 

@@ -44,14 +44,14 @@ class ListRepos(commands.Cog):
                     )
                     embed.add_field(name="Dépôts", value="\n".join(repos), inline=False)
 
-                    await interaction.response.send_message(embed=embed, ephemeral=True)
+                    await interaction.response.send_message(embed=embed, ephemeral=False)
                 else:
-                    await interaction.response.send_message("Aucun dépôt trouvé.", ephemeral=True)
+                    await interaction.response.send_message("Aucun dépôt trouvé.", ephemeral=False)
             else:
-                await interaction.response.send_message("Vous n'êtes pas encore enregistré.", ephemeral=True)
+                await interaction.response.send_message("Vous n'êtes pas encore enregistré.", ephemeral=False)
         except Exception as e:
             print(f"❌ Erreur dans la commande /list_repos : {e}")
-            await interaction.response.send_message("Une erreur s'est produite lors de la récupération des dépôts.", ephemeral=True)
+            await interaction.response.send_message("Une erreur s'est produite lors de la récupération des dépôts.", ephemeral=False)
 
     def get_user_repos(self, github_token):
         try:
