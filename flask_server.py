@@ -18,6 +18,7 @@ CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET")
 REDIRECT_URI = os.getenv("GITHUB_REDIRECT_URI")
 WEBHOOK_URL = os.getenv("WEBHOOK_URL")
 
+
 # Chemin de la base de données
 DATABASE_PATH = os.path.join("database", "database.db")
 conn = sqlite3.connect(DATABASE_PATH, check_same_thread=False)
