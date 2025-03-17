@@ -186,150 +186,17 @@ class AddRepo(commands.Cog):
             inline=False
         )
         embed.add_field(
-            name="2️⃣ Ajouter un fichier `notify-discord.yml`",
-            value="Dans `.github/workflows`, créez un fichier nommé `notify-discord.yml`.",
+            name="2️⃣ Ajouter le fichier `notify-discord.yml`",
+            value="Dans `.github/workflows`, ajoutez le fichier nommé `notify-discord.yml` disponible en pièce jointe.",
             inline=False
         )
 
+        file = discord.File(".github/workflows/notify-discord.yml")
+        await interaction.followup.send("📄 Mettez ce fichier YAML dans le dossier  :", file=file)
+
+
         embed.set_footer(text="Cliquez sur le bouton ci-dessous lorsque vous avez terminé toutes les étapes.")
-        button = Button(label="✅ J'ai terminé", style=discord.ButtonStyle.success)
-
-        async def button_callback(interaction_button: discord.Interaction, interaction, repo_name, github_token):
-            try:
-                workflow_content = "name: Envoyer une notification discord lors de modifications sur le repo.\n"
-                "on:\n"
-                "  push:\n"
-                "    branches:\n"
-                "      - '**'\n"
-                "  pull_request:\n"
-                "    types:\n"
-                "      - opened\n"
-                "      - closed\n"
-                "      - reopened\n"
-                "      - edited\n"
-                "      - review_requested\n"
-                "      - review_request_removed\n"
-                "  issues:\n"
-                "    types:\n"
-                "      - opened\n"
-                "      - closed\n"
-                "      - reopened\n"
-                "      - edited\n"
-                "  fork:\n"
-                "  release:\n"
-                "    types:\n"
-                "      - published\n"
-                "      - edited\n"
-                "      - prereleased\n"
-                "jobs:\n"
-                "  notify:\n"
-                "    runs-on: ubuntu-latest\n"
-                "    steps:\n"
-                "      - name: Push Notification\n"
-                "        if: \\${{ github.event_name == 'push' }}\n"
-                "        uses: appleboy/discord-action@master\n"
-                "        with:\n"
-                "          webhook_url: \\${{ secrets.DISCORD_WEBHOOK_URL }}\n"
-                "          message: |\n"
-                "            📢 **Commit détecté !**\n"
-                "            - **Dépôt** : \\${{ github.repository }}\n"
-                "            - **Acteur** : \\${{ github.actor }}\n"
-                "            - **Message** : \\${{ github.event.head_commit.message }}\n"
-                "            - **Lien du commit** : \\${{ github.event.head_commit.url }}\n"
-                "\n"
-                "      - name: Pull Request Opened Notification\n"
-                "        if: \\${{ github.event_name == 'pull_request' && github.event.action == 'opened' }}\n"
-                "        uses: appleboy/discord-action@master\n"
-                "        with:\n"
-                "          webhook_url: \\${{ secrets.DISCORD_WEBHOOK_URL }}\n"
-                "          message: |\n"
-                "            🚀 **Nouvelle Pull Request !**\n"
-                "            - **Dépôt** : \\${{ github.repository }}\n"
-                "            - **Auteur** : \\${{ github.actor }}\n"
-                "            - **Titre** : \\${{ github.event.pull_request.title }}\n"
-                "            - **Description** : \\${{ github.event.pull_request.body }}\n"
-                "            - **Lien** : \\${{ github.event.pull_request.html_url }}\n"
-                "\n"
-                "      - name: Pull Request Closed Notification\n"
-                "        if: \\${{ github.event_name == 'pull_request' && github.event.action == 'closed' }}\n"
-                "        uses: appleboy/discord-action@master\n"
-                "        with:\n"
-                "          webhook_url: \\${{ secrets.DISCORD_WEBHOOK_URL }}\n"
-                "          message: |\n"
-                "            ✅ **Pull Request fermée !**\n"
-                "            - **Dépôt** : \\${{ github.repository }}\n"
-                "            - **Auteur** : \\${{ github.actor }}\n"
-                "            - **Titre** : \\${{ github.event.pull_request.title }}\n"
-                "            - **Lien** : \\${{ github.event.pull_request.html_url }}\n"
-                "\n"
-                "      - name: Issue Opened Notification\n"
-                "        if: \\${{ github.event_name == 'issues' && github.event.action == 'opened' }}\n"
-                "        uses: appleboy/discord-action@master\n"
-                "        with:\n"
-                "          webhook_url: \\${{ secrets.DISCORD_WEBHOOK_URL }}\n"
-                "          message: |\n"
-                "            📝 **Nouvelle Issue !**\n"
-                "            - **Dépôt** : \\${{ github.repository }}\n"
-                "            - **Auteur** : \\${{ github.actor }}\n"
-                "            - **Titre** : \\${{ github.event.issue.title }}\n"
-                "            - **Description** : \\${{ github.event.issue.body }}\n"
-                "            - **Lien** : \\${{ github.event.issue.html_url }}\n"
-                "\n"
-                "      - name: Fork Notification\n"
-                "        if: \\${{ github.event_name == 'fork' }}\n"
-                "        uses: appleboy/discord-action@master\n"
-                "        with:\n"
-                "          webhook_url: \\${{ secrets.DISCORD_WEBHOOK_URL }}\n"
-                "          message: |\n"
-                "            🍴 **Nouveau fork !**\n"
-                "            - **Dépôt original** : \\${{ github.repository }}\n"
-                "            - **Fork réalisé par** : \\${{ github.actor }}\n"
-                "            - **Lien du fork** : \\${{ github.event.forkee.html_url }}\n"
-                "\n"
-                "      - name: Release Published Notification\n"
-                "        if: \\${{ github.event_name == 'release' && github.event.action == 'published' }}\n"
-                "        uses: appleboy/discord-action@master\n"
-                "        with:\n"
-                "          webhook_url: \\${{ secrets.DISCORD_WEBHOOK_URL }}\n"
-                "          message: |\n"
-                "            🎉 **Nouvelle Release !**\n"
-                "            - **Dépôt** : \\${{ github.repository }}\n"
-                "            - **Auteur** : \\${{ github.actor }}\n"
-                "            - **Nom** : \\${{ github.event.release.name }}\n"
-                "            - **Description** : \\${{ github.event.release.body }}\n"
-                "            - **Lien** : \\${{ github.event.release.html_url }}\n"
-
-                encoded_content = base64.b64encode(workflow_content.encode("utf-8")).decode("utf-8")
-                url = f"https://api.github.com/repos/{repo_name}/contents/.github/workflows/notify-discord.yml"
-                headers = {
-                    "Authorization": f"token {github_token}",
-                    "Accept": "application/vnd.github.v3+json"
-                }
-                response = requests.get(url, headers=headers)
-                payload = {
-                    "message": "Ajout ou mise à jour du workflow Discord.",
-                    "content": encoded_content
-                }
-                if response.status_code == 200:
-                    sha = response.json().get("sha")
-                    payload["sha"] = sha
-                response = requests.put(url, headers=headers, json=payload)
-                if response.status_code in [200, 201]:
-                    await interaction_button.response.send_message("Vous avez validé les étapes avec succès ! 🎉")
-                else:
-                    await interaction_button.response.send_message("Une erreur est survenue.")
-            except Exception as e:
-                print(f"Erreur lors de l'exécution de la méthode add_or_update_workflow : {e}")
-                await interaction.response.send_message(
-                    "Une erreur inattendue s'est produite.",
-                    ephemeral=True
-                )
-            await interaction_button.response.send_message("Vous avez validé les étapes avec succès ! 🎉")
-
-        button.callback = button_callback
-        view = View()
-        view.add_item(button)
-        await interaction.followup.send(embed=embed, view=view)
+        await interaction.followup.send(embed=embed)
 
 async def setup(bot):
     await bot.add_cog(AddRepo(bot))

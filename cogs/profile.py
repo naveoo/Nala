@@ -21,12 +21,12 @@ class Profile(commands.Cog):
             target_user = user or interaction.user
             discord_id = str(target_user.id)
             cursor.execute('''
-            SELECT github_username, github_token, created_at, notifications_enabled FROM Users WHERE id = ?
+            SELECT github_username, github_token, created_at FROM Users WHERE id = ?
             ''', (discord_id,))
             result = cursor.fetchone()
 
             if result:
-                github_username, github_token, created_at, notifications_enabled = result
+                github_username, github_token, created_at = result
                 cursor.execute('''
                 SELECT repo_name FROM UserRepos WHERE discord_id = ?
                 ''', (discord_id,))
@@ -42,7 +42,6 @@ class Profile(commands.Cog):
                 embed.set_thumbnail(url=target_user.avatar.url)
                 embed.add_field(name="Nom GitHub", value=github_username, inline=False)
                 embed.add_field(name="Date d'inscription", value=created_at, inline=False)
-                embed.add_field(name="Notifications", value="Activées" if notifications_enabled else "Désactivées", inline=False)
                 embed.add_field(name="Dépôts suivis", value="\n".join(repo_stars) if repo_stars else "Aucun dépôt suivi", inline=False)
                 await interaction.response.send_message(embed=embed, ephemeral=False)
             else:
