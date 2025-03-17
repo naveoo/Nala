@@ -3,21 +3,17 @@ import requests
 import sqlite3
 from dotenv import load_dotenv
 import os
-import discord
 import asyncio
 import hmac
 import hashlib
 
-# Charger les variables d'environnement
 load_dotenv()
 
-# Configuration GitHub
 CLIENT_ID = os.getenv("GITHUB_CLIENT_ID")
 CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET")
 REDIRECT_URI = os.getenv("GITHUB_REDIRECT_URI")
 WEBHOOK_URL = os.getenv("WEBHOOK_URL")
 
-# Chemin de la base de données
 DATABASE_PATH = os.path.join("database", "database.db")
 conn = sqlite3.connect(DATABASE_PATH, check_same_thread=False)
 cursor = conn.cursor()
@@ -25,17 +21,10 @@ cursor = conn.cursor()
 def create_flask_app(bot):
     app = Flask(__name__)
 
-    # Middleware pour ajouter automatiquement l'en-tête "ngrok-skip-browser-warning"
-    @app.after_request
-    def add_ngrok_header(response):
-        response.headers["ngrok-skip-browser-warning"] = "true"
-        return response
-
     @app.route("/")
     def home(): 
         return "Hello, world!"
 
-    # Route pour gérer le callback GitHub OAuth
     @app.route("/callback")
     def callback():
         code = request.args.get("code")
@@ -66,7 +55,6 @@ def create_flask_app(bot):
 
     return app
 
-# Fonction pour récupérer le token GitHub
 def get_github_token(code):
     url = "https://github.com/login/oauth/access_token"
     payload = {
@@ -79,7 +67,6 @@ def get_github_token(code):
     response = requests.post(url, json=payload, headers=headers)
     return response.json().get("access_token") if response.status_code == 200 else None
 
-# Fonction pour récupérer le nom d'utilisateur GitHub
 def get_github_username(token):
     url = "https://api.github.com/user"
     headers = {
@@ -89,7 +76,6 @@ def get_github_username(token):
     response = requests.get(url, headers=headers)
     return response.json().get("login") if response.status_code == 200 else None
 
-# Fonction pour sauvegarder les informations GitHub
 def save_github_info(discord_id, github_username, token):
     cursor.execute('''
     INSERT OR REPLACE INTO Users (id, github_username, github_token)
@@ -97,12 +83,10 @@ def save_github_info(discord_id, github_username, token):
     ''', (discord_id, github_username, token))
     conn.commit()
 
-# Fonction pour vérifier la signature du webhook
 def verify_webhook_signature(secret, payload, signature):
     expected_signature = 'sha256=' + hmac.new(secret.encode(), payload, hashlib.sha256).hexdigest()
     return hmac.compare_digest(expected_signature, signature)
 
-# Fonction pour envoyer un message Discord
 def send_discord_dm(bot, discord_id, message):
     user = bot.get_user(int(discord_id))
     if user:

@@ -6,10 +6,7 @@ import requests
 import os
 from dotenv import load_dotenv
 
-# Charger les variables d'environnement
 load_dotenv()
-
-# Connexion à la base de données
 DATABASE_PATH = os.path.join("database", "database.db")
 conn = sqlite3.connect(DATABASE_PATH, check_same_thread=False)
 cursor = conn.cursor()
@@ -21,11 +18,8 @@ class Profile(commands.Cog):
     @app_commands.command(name="profile", description="Affichez votre profil ou celui d'un autre utilisateur.")
     async def profile(self, interaction: discord.Interaction, user: discord.User = None):
         try:
-            # Si aucun utilisateur n'est mentionné, utiliser l'utilisateur qui a exécuté la commande
             target_user = user or interaction.user
             discord_id = str(target_user.id)
-
-            # Récupérer les informations de l'utilisateur depuis la base de données
             cursor.execute('''
             SELECT github_username, github_token, created_at, notifications_enabled FROM Users WHERE id = ?
             ''', (discord_id,))
@@ -33,31 +27,23 @@ class Profile(commands.Cog):
 
             if result:
                 github_username, github_token, created_at, notifications_enabled = result
-
-                # Récupérer les dépôts suivis par l'utilisateur
                 cursor.execute('''
                 SELECT repo_name FROM UserRepos WHERE discord_id = ?
                 ''', (discord_id,))
                 repos = [row[0] for row in cursor.fetchall()]
-
-                # Récupérer le nombre d'étoiles pour chaque dépôt
                 repo_stars = []
                 for repo in repos:
                     stars = self.get_repo_stars(repo, github_token)
                     repo_stars.append(f"{repo} : {stars} ⭐")
-
-                # Créer un embed pour afficher les informations
                 embed = discord.Embed(
                     title=f"Profil de {target_user.name}",
                     color=discord.Color.blue()
                 )
-                embed.set_thumbnail(url=target_user.avatar.url)  # Ajouter la photo de profil
+                embed.set_thumbnail(url=target_user.avatar.url)
                 embed.add_field(name="Nom GitHub", value=github_username, inline=False)
                 embed.add_field(name="Date d'inscription", value=created_at, inline=False)
                 embed.add_field(name="Notifications", value="Activées" if notifications_enabled else "Désactivées", inline=False)
                 embed.add_field(name="Dépôts suivis", value="\n".join(repo_stars) if repo_stars else "Aucun dépôt suivi", inline=False)
-
-                # Envoyer l'embed dans le canal (non caché)
                 await interaction.response.send_message(embed=embed, ephemeral=False)
             else:
                 await interaction.response.send_message(f"{target_user.name} n'est pas encore enregistré.", ephemeral=True)

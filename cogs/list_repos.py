@@ -6,10 +6,8 @@ import requests
 import os
 from dotenv import load_dotenv
 
-# Charger les variables d'environnement
 load_dotenv()
 
-# Connexion à la base de données
 DATABASE_PATH = os.path.join("database", "database.db")
 conn = sqlite3.connect(DATABASE_PATH, check_same_thread=False)
 cursor = conn.cursor()
@@ -23,7 +21,6 @@ class ListRepos(commands.Cog):
         discord_id = str(interaction.user.id)
 
         try:
-            # Récupérer le token GitHub de l'utilisateur
             cursor.execute('''
             SELECT github_token FROM Users WHERE id = ?
             ''', (discord_id,))
@@ -31,12 +28,9 @@ class ListRepos(commands.Cog):
 
             if result:
                 github_token = result[0]
-
-                # Récupérer la liste des dépôts de l'utilisateur
                 repos = self.get_user_repos(github_token)
 
                 if repos:
-                    # Créer un embed pour afficher la liste des dépôts
                     embed = discord.Embed(
                         title="📂 Vos dépôts GitHub",
                         description="Voici la liste des dépôts auxquels vous avez accès :",
@@ -61,7 +55,7 @@ class ListRepos(commands.Cog):
                 "Accept": "application/vnd.github.v3+json"
             }
             params = {
-                "per_page": 100  # Limiter à 100 dépôts par page
+                "per_page": 100
             }
             response = requests.get(url, headers=headers, params=params)
             if response.status_code == 200:
