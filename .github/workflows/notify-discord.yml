@@ -8,7 +8,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Send Discord Notification
-        uses: Ilshidur/action-discord@master
+        uses: appleboy/discord-action@master
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          args: '{"content": "Nouveau commit sur **${{ github.repository }}** par **${{ github.actor }}** :\n- **Message** : ${{ github.event.head_commit.message }}\n- **Lien** : ${{ github.event.head_commit.url }}"}'
+          message: |
+            Nouveau commit sur **${{ github.repository }}** par **${{ github.actor }}** :
+            - **Message** : ${{ github.event.head_commit.message }}
+            - **Lien** : ${{ github.event.head_commit.url }}
