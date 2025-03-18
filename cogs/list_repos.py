@@ -4,6 +4,7 @@ from discord import app_commands
 import sqlite3
 import requests
 import os
+import traceback
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -15,6 +16,7 @@ cursor = conn.cursor()
 class ListRepos(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.logs_channel = bot.get_channel(int(os.getenv("LOGS_CHANNEL")))
 
     @app_commands.command(name="list_repos", description="Listez les dépôts GitHub auxquels vous pouvez vous inscrire.")
     async def list_repos(self, interaction: discord.Interaction):
@@ -28,7 +30,7 @@ class ListRepos(commands.Cog):
 
             if result:
                 github_token = result[0]
-                repos = self.get_user_repos(github_token)
+                repos = await self.get_user_repos(github_token)
 
                 if repos:
                     embed = discord.Embed(
@@ -44,10 +46,10 @@ class ListRepos(commands.Cog):
             else:
                 await interaction.response.send_message("Vous n'êtes pas encore enregistré.", ephemeral=False)
         except Exception as e:
-            print(f"❌ Erreur dans la commande /list_repos : {e}")
+            await self.log_error("/list_repos", interaction, e)
             await interaction.response.send_message("Une erreur s'est produite lors de la récupération des dépôts.", ephemeral=False)
 
-    def get_user_repos(self, github_token):
+    async def get_user_repos(self, github_token):
         try:
             url = "https://api.github.com/user/repos"
             headers = {
@@ -65,8 +67,22 @@ class ListRepos(commands.Cog):
                 print(f"Erreur GitHub API : {response.status_code} - {response.text}")
                 return None
         except Exception as e:
-            print(f"Erreur lors de la récupération des dépôts GitHub : {e}")
+            await self.log_error("/list_repos", None, e)
             return None
+
+    async def log_error(self, command, interaction, error):
+        if not self.logs_channel:
+            print("Erreur : Canal de logs introuvable.")
+            return
+        
+        embed = discord.Embed(title=f"Erreur dans la commande {command}",
+                              description=f"Utilisateur : {interaction.user.name if interaction else 'N/A'} ({interaction.user.id if interaction else 'N/A'})\nServeur : {interaction.guild.name if interaction else 'N/A'} ({interaction.guild.id if interaction else 'N/A'})",
+                              color=discord.Color.red())
+        error_details = traceback.format_exc() or str(error)
+        if len(error_details) > 1990:
+            error_details = error_details[:1990] + "...\n(tronqué)"
+        embed.add_field(name="Détails de l'erreur", value=f"```{error_details}```", inline=False)
+        await self.logs_channel.send(embed=embed)
 
 async def setup(bot):
     await bot.add_cog(ListRepos(bot))
