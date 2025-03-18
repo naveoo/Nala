@@ -6,7 +6,6 @@ import sqlite3
 from datetime import datetime
 from dotenv import load_dotenv
 import os
-import traceback
 
 load_dotenv()
 
@@ -20,12 +19,6 @@ cursor = conn.cursor()
 class Register(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.logs_channel = None
-
-    async def cog_load(self):
-        """S'exécute après le chargement du cog."""
-        await self.bot.wait_until_ready()
-        self.logs_channel = self.bot.get_channel(int(os.getenv("LOGS_CHANNEL")))
 
     @app_commands.command(name="register", description="Enregistrez-vous pour lier votre compte GitHub.")
     async def register(self, interaction: discord.Interaction):
@@ -56,23 +49,8 @@ class Register(commands.Cog):
             embed.set_footer(text="Vous avez 5 minutes pour compléter l'authentification.")
             await interaction.followup.send(embed=embed, ephemeral=False)
         except Exception as e:
-            await self.log_error("/register", interaction, e)
-            if not interaction.response.is_done():
-                await interaction.followup.send("Une erreur s'est produite lors de l'exécution de la commande.", ephemeral=False)
-
-    async def log_error(self, command, interaction, error):
-        if not self.logs_channel:
-            print("Erreur : Canal de logs introuvable.")
-            return
-
-        embed = discord.Embed(title=f"Erreur dans la commande {command}",
-                              description=f"Utilisateur : {interaction.user.name if interaction else 'N/A'} ({interaction.user.id if interaction else 'N/A'})\nServeur : {interaction.guild.name if interaction else 'N/A'} ({interaction.guild.id if interaction else 'N/A'})",
-                              color=discord.Color.red())
-        error_details = traceback.format_exc() or str(error)
-        if len(error_details) > 1990:
-            error_details = error_details[:1990] + "...\n(tronqué)"
-        embed.add_field(name="Détails de l'erreur", value=f"```{error_details}```", inline=False)
-        await self.logs_channel.send(embed=embed)
+            print(f"❌ Erreur dans la commande /register : {e}")
+            await interaction.followup.send("Une erreur s'est produite lors de l'exécution de la commande.", ephemeral=False)
 
 async def setup(bot):
     await bot.add_cog(Register(bot))

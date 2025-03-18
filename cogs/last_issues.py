@@ -10,12 +10,7 @@ load_dotenv()
 class ListIssues(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.logs_channel = None
-
-    async def cog_load(self):
-        """S'exécute après le chargement du cog."""
-        await self.bot.wait_until_ready()
-        self.logs_channel = self.bot.get_channel(int(os.getenv("LOGS_CHANNEL")))
+        self.bot.get_channel(int(os.getenv("LOGS_CHANNEL")))
 
     @app_commands.command(name="list_issues", description="Liste les 5 dernières issues ouvertes d'un dépôt GitHub.")
     @app_commands.describe(repo_name="Nom du dépôt GitHub (format : owner/repo)")
@@ -54,19 +49,8 @@ class ListIssues(commands.Cog):
                 return response.json()
             return None
         except Exception as e:
-            await self.log_error("/list_issues - get_open_issues", None, e)
+            print(f"❌ Erreur dans la commande /last_issues : {e}")
             return None
-
-    async def log_error(self, command, interaction, error):
-        if not self.logs_channel:
-            print("Erreur : Canal de logs introuvable.")
-            return
-        embed = discord.Embed(title=f"Erreur dans la commande {command}", color=discord.Color.red())
-        error_details = str(error)
-        if len(error_details) > 1990:
-            error_details = error_details[:1990] + "...\n(tronqué)"
-        embed.add_field(name="Détails de l'erreur", value=f"```{error_details}```", inline=False)
-        await self.logs_channel.send(embed=embed)
 
 async def setup(bot):
     await bot.add_cog(ListIssues(bot))
