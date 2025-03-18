@@ -3,7 +3,8 @@ import os
 from discord.ext import commands
 from dotenv import load_dotenv
 import asyncio
-from flask_server import create_flask_app
+import threading
+from flask_server import run_flask_in_thread
 
 load_dotenv()
 
@@ -14,9 +15,8 @@ intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-def run_flask(bot):
-    app = create_flask_app(bot)
-    app.run(host="0.0.0.0", port=5000, debug=False)
+def run_flask():
+    run_flask_in_thread(bot)
 
 @bot.event
 async def on_ready():
@@ -35,8 +35,10 @@ async def setup_hook():
     print(f"Commandes chargées : {[cmd.name for cmd in bot.tree.get_commands()]}")
 
 async def main():
-    loop = asyncio.get_running_loop()
-    loop.run_in_executor(None, run_flask, bot)
+    flask_thread = threading.Thread(target=run_flask)
+    flask_thread.daemon = True
+    flask_thread.start()
+
     await bot.start(TOKEN)
 
 if __name__ == "__main__":

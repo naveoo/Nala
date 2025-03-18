@@ -15,8 +15,7 @@ cursor = conn.cursor()
 class Profile(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.logs_channel = None  # Initialisation différée
-
+        self.logs_channel = None
     async def cog_load(self):
         """S'exécute après le chargement du cog."""
         await self.bot.wait_until_ready()
