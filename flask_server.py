@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request
 import requests
 import sqlite3
 from dotenv import load_dotenv
@@ -28,6 +28,9 @@ def create_flask_app(bot):
         state = request.args.get("state")
         if not code or not state:
             return "Erreur : Paramètres manquants."
+
+        conn = sqlite3.connect(DATABASE_PATH)
+        cursor = conn.cursor()
 
         cursor.execute('SELECT discord_id FROM PendingRegistrations WHERE state = ?', (state,))
         result = cursor.fetchone()
@@ -71,6 +74,8 @@ def create_flask_app(bot):
         return response.json().get("login") if response.status_code == 200 else None
 
     def save_github_info(discord_id, github_username, token):
+        conn = sqlite3.connect(DATABASE_PATH)
+        cursor = conn.cursor()
         cursor.execute('''
         INSERT OR REPLACE INTO Users (id, github_username, github_token)
         VALUES (?, ?, ?)
@@ -78,7 +83,3 @@ def create_flask_app(bot):
         conn.commit()
 
     return app
-
-def run_flask_in_thread(bot):
-    app = create_flask_app(bot)
-    app.run(host="0.0.0.0", port=5000, debug=True, use_reloader=False)
