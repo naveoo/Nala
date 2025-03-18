@@ -3,7 +3,7 @@ import os
 from discord.ext import commands
 from dotenv import load_dotenv
 import asyncio
-from flask_server import create_quart_app
+from flask_server import run_flask_in_thread
 
 load_dotenv()
 
@@ -13,13 +13,6 @@ GUILD_ID = int(os.getenv("GUILD_ID"))
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
-
-# Fonction pour démarrer Quart
-async def run_quart():
-    print("Démarrage du serveur Quart...")  # Journal pour vérifier le lancement
-    app = create_quart_app(bot)
-    await app.run_task(host="0.0.0.0", port=5000, debug=True)
-    print("Serveur Quart lancé.")  # Devrait s'afficher si tout fonctionne
 
 @bot.event
 async def on_ready():
@@ -32,7 +25,7 @@ async def on_ready():
 
 @bot.event
 async def setup_hook():
-    print("Chargement des cogs...")  # Journal pour le débogage
+    print("Chargement des cogs...")
     for filename in os.listdir("./cogs"):
         if filename.endswith(".py"):
             try:
@@ -43,16 +36,15 @@ async def setup_hook():
     print(f"Commandes chargées : {[cmd.name for cmd in bot.tree.get_commands()]}")
 
 async def main():
-    print("Lancement des processus...")  # Journal initial
-    try:
-        quart_task = asyncio.create_task(run_quart())
-        bot_task = asyncio.create_task(bot.start(TOKEN))
-        await asyncio.gather(quart_task, bot_task)
-    except Exception as e:
-        print(f"❌ Une erreur s'est produite dans main() : {e}")
+    print("Lancement du serveur Flask et du bot Discord...")
+    
+    loop = asyncio.get_event_loop()
+    await loop.run_in_executor(None, run_flask_in_thread, bot)
+
+    await bot.start(TOKEN)
 
 if __name__ == "__main__":
     try:
         asyncio.run(main())
     except Exception as e:
-        print(f"❌ Échec lors de l'exécution du programme principal : {e}")
+        print(f"❌ Une erreur s'est produite : {e}")
