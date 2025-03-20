@@ -36,7 +36,11 @@ class Help(commands.Cog):
         )
         embed.add_field(
             name="Autres",
-            value="`/generate_uuid` • Permet de générer une uuid (identifiant unique)."
+            value=(
+                "`/generate_uuid` • Permet de générer une uuid (identifiant unique).\n"
+                "`/generate_uuid <longueur>` • Permet de générer un mot de passe aléatoire."
+            ),
+            inline=False
         )
 
         await interaction.followup.send(embed=embed)
