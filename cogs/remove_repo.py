@@ -35,14 +35,13 @@ class RemoveRepo(commands.Cog):
                 webhook_info = cursor.fetchone()
 
                 if webhook_info:
-                    webhook_id = webhook_info[0]
                     self.delete_github_workflow(repo_name, github_token)
                     cursor.execute('''
                     DELETE FROM UserRepos
                     WHERE discord_id = ? AND repo_name = ?
                     ''', (discord_id, repo_name))
                     conn.commit()
-                    if self.delete_github_secret(github_token,SECRET_NAME, repo_name):
+                    if self.delete_github_secret(interaction, github_token,SECRET_NAME, repo_name):
                         if cursor.rowcount > 0:
                             await interaction.response.send_message(
                                 f"Le dépôt `{repo_name}` a été retiré de votre profil. Le webhook et le workflow ont été supprimés.",
@@ -69,13 +68,16 @@ class RemoveRepo(commands.Cog):
                     ephemeral=True
                 )
         except Exception as e:
+            embed = discord.Embed(title="Erreur dans /remove_repo", description="Une erreur est apparue à l'éxecution de la commande", color=discord.Color.red())
+            embed.add_field(name="Détails de l'erreur", value=f"Utilisateur : {interaction.user.name} ({interaction.user.id})\nServeur : {interaction.guild.name} ({interaction.guild.id})")
+            embed.add_field(name="Retour console", value=e[:1000])
             print(f"❌ Erreur dans la commande /remove_repo : {e}")
             await interaction.response.send_message(
                 "Une erreur s'est produite lors de la suppression du dépôt.",
                 ephemeral=True
             )
 
-    def delete_github_workflow(self, repo_name, github_token):
+    def delete_github_workflow(self, interaction, repo_name, github_token):
         try:
             url = f"https://api.github.com/repos/{repo_name}/contents/.github/workflows/notify-discord.yml"
             headers = {
@@ -95,9 +97,12 @@ class RemoveRepo(commands.Cog):
                 print(f"Fichier de workflow introuvable : {response.status_code} - {response.text}")
                 return False
         except Exception as e:
+            embed = discord.Embed(title="Erreur dans /remove_repo", description="Une erreur est apparue à l'éxecution de la commande", color=discord.Color.red())
+            embed.add_field(name="Détails de l'erreur", value=f"Utilisateur : {interaction.user.name} ({interaction.user.id})\nServeur : {interaction.guild.name} ({interaction.guild.id})")
+            embed.add_field(name="Retour console", value=e[:1000])
             print(f"Erreur lors de la suppression du workflow GitHub : {e}")
             return False
-    def delete_github_secret(self, github_token, secret_name, repo_name):
+    def delete_github_secret(self, interaction, github_token, secret_name, repo_name):
         try:
             url = f"https://api.github.com/repos/{repo_name}/actions/secrets/{secret_name}"
             headers = {
@@ -112,6 +117,9 @@ class RemoveRepo(commands.Cog):
                 print(f"Erreur lors de la suppression du secret '{secret_name}': {response.status_code} - {response.text}")
                 return False
         except Exception as e:
+            embed = discord.Embed(title="Erreur dans /remove_repo", description="Une erreur est apparue à l'éxecution de la commande", color=discord.Color.red())
+            embed.add_field(name="Détails de l'erreur", value=f"Utilisateur : {interaction.user.name} ({interaction.user.id})\nServeur : {interaction.guild.name} ({interaction.guild.id})")
+            embed.add_field(name="Retour console", value=e[:1000])
             print(f"Exception lors de la suppression du secret '{secret_name}': {e}")
             return False
 async def setup(bot):

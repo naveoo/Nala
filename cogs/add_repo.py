@@ -17,24 +17,6 @@ DATABASE_PATH = os.path.join("database", "database.db")
 conn = sqlite3.connect(DATABASE_PATH, check_same_thread=False)
 cursor = conn.cursor()
 
-try:
-    cursor.execute("PRAGMA table_info(UserRepos)")
-    columns = cursor.fetchall()
-    
-    webhook_url_exists = False
-    for column in columns:
-        if column[1] == 'webhook_url':
-            webhook_url_exists = True
-            break
-            
-    if not webhook_url_exists:
-        print("⚠️ Ajout de la colonne webhook_url à la table UserRepos...")
-        cursor.execute("ALTER TABLE UserRepos ADD COLUMN webhook_url TEXT")
-        conn.commit()
-        print("✅ Colonne webhook_url ajoutée avec succès.")
-except Exception as e:
-    print(f"❌ Erreur lors de la vérification/ajout de la colonne webhook_url: {e}")
-
 class AddRepo(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -91,6 +73,9 @@ class AddRepo(commands.Cog):
                     ephemeral=True
                 )
         except Exception as e:
+            embed = discord.Embed(title="Erreur dans /add_repo", description="Une erreur est apparue à l'éxecution de la commande", color=discord.Color.red())
+            embed.add_field(name="Détails de l'erreur", value=f"Utilisateur : {interaction.user.name} ({interaction.user.id})\nServeur : {interaction.guild.name} ({interaction.guild.id})")
+            embed.add_field(name="Retour console", value=e[:1000])
             print(f"❌ Erreur dans la commande /add_repo : {e}")
             await interaction.followup.send(
                 "Une erreur s'est produite lors de l'ajout du dépôt.",

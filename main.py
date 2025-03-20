@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 import asyncio
 from flask_server import create_flask_app
 from datetime import datetime
+from threading import Thread
 from colorama import init, Fore
 
 init(autoreset=True)
@@ -51,11 +52,14 @@ async def setup_hook():
                 raise e
     log_info(f"Commandes chargées : {[cmd.name for cmd in bot.tree.get_commands()]}")
 
+def run_flask():
+    flask_app = create_flask_app(bot)
+    flask_app.run(debug=True, use_reloader=False)
+
 async def main():
     log_info("Lancement du serveur Flask et du bot Discord...")
     
-    loop = asyncio.get_event_loop()
-    await loop.run_in_executor(None, create_flask_app, bot)
+    Thread(target=run_flask).start()
 
     await bot.start(TOKEN)
 

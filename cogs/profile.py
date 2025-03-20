@@ -15,8 +15,12 @@ class Profile(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.Cog.listener()
+    async def on_ready(self):
+        self.logs_channel = self.bot.get_channel(int(os.getenv("LOGS_CHANNEL")))
+    
     @app_commands.command(name="profile", description="Affichez votre profil ou celui d'un autre utilisateur.")
-    async def profile(self, interaction: discord.Interaction, user: discord.User = None):
+    async def profile(self, interaction: discord.Interaction, user: discord.User = None):   
         try:
             target_user = user or interaction.user
             discord_id = str(target_user.id)
@@ -47,6 +51,9 @@ class Profile(commands.Cog):
             else:
                 await interaction.response.send_message(f"{target_user.name} n'est pas encore enregistré.", ephemeral=True)
         except Exception as e:
+            embed = discord.Embed(title="Erreur dans /profile", description="Une erreur est apparue à l'éxecution de la commande", color=discord.Color.red())
+            embed.add_field(name="Détails de l'erreur", value=f"Utilisateur : {interaction.user.name} ({interaction.user.id})\nServeur : {interaction.guild.name} ({interaction.guild.id})")
+            embed.add_field(name="Retour console", value=e[:1000])
             print(f"❌ Erreur dans la commande /profile : {e}")
             await interaction.response.send_message("Une erreur s'est produite lors de l'exécution de la commande.", ephemeral=True)
 

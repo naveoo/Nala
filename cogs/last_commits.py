@@ -18,7 +18,7 @@ class LastCommits(commands.Cog):
                 await interaction.followup.send("Le token GitHub n'est pas configuré.", ephemeral=True)
                 return
 
-            commits = await self.get_last_commits(repo_name, github_token)
+            commits = await self.get_last_commits(interaction, repo_name, github_token)
             if commits is None:
                 await interaction.followup.send(f"Le dépôt `{repo_name}` n'existe pas ou vous n'y avez pas accès.", ephemeral=True)
                 return
@@ -40,10 +40,13 @@ class LastCommits(commands.Cog):
             
             await interaction.followup.send(embed=embed)
         except Exception as e:
+            embed = discord.Embed(title="Erreur dans /last_commits", description="Une erreur est apparue à l'éxecution de la commande", color=discord.Color.red())
+            embed.add_field(name="Détails de l'erreur", value=f"Utilisateur : {interaction.user.name} ({interaction.user.id})\nServeur : {interaction.guild.name} ({interaction.guild.id})")
+            embed.add_field(name="Retour console", value=e[:1000])
             print(f"❌ Erreur dans la commande /last_commits : {e}")
             await interaction.followup.send("Une erreur s'est produite lors de la récupération des commits.", ephemeral=True)
 
-    async def get_last_commits(self, repo_name, github_token):
+    async def get_last_commits(self, interaction, repo_name, github_token):
         try:
             url = f"https://api.github.com/repos/{repo_name}/commits?per_page=5"
             headers = {"Authorization": f"token {github_token}", "Accept": "application/vnd.github.v3+json"}
@@ -54,6 +57,9 @@ class LastCommits(commands.Cog):
                 print(f"❌ Erreur dans l'appel Github.")
                 return None
         except Exception as e:
+            embed = discord.Embed(title="Erreur dans /last_commits", description="Une erreur est apparue à l'éxecution de la commande", color=discord.Color.red())
+            embed.add_field(name="Détails de l'erreur", value=f"Utilisateur : {interaction.user.name} ({interaction.user.id})\nServeur : {interaction.guild.name} ({interaction.guild.id})")
+            embed.add_field(name="Retour console", value=e[:1000])
             print(f"❌ Erreur dans la commande /last_commits : {e}")
             return None
 

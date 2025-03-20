@@ -44,6 +44,9 @@ class ListRepos(commands.Cog):
             else:
                 await interaction.response.send_message("Vous n'êtes pas encore enregistré.", ephemeral=False)
         except Exception as e:
+            embed = discord.Embed(title="Erreur dans /list_repos", description="Une erreur est apparue à l'éxecution de la commande", color=discord.Color.red())
+            embed.add_field(name="Détails de l'erreur", value=f"Utilisateur : {interaction.user.name} ({interaction.user.id})\nServeur : {interaction.guild.name} ({interaction.guild.id})")
+            embed.add_field(name="Retour console", value=e[:1000])
             print(f"❌ Erreur dans la commande /list_repos : {e}")
             await interaction.response.send_message("Une erreur s'est produite lors de la récupération des dépôts.", ephemeral=False)
 

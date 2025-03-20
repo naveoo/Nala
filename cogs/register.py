@@ -49,6 +49,9 @@ class Register(commands.Cog):
             embed.set_footer(text="Vous avez 5 minutes pour compléter l'authentification.")
             await interaction.followup.send(embed=embed, ephemeral=False)
         except Exception as e:
+            embed = discord.Embed(title="Erreur dans /register", description="Une erreur est apparue à l'éxecution de la commande", color=discord.Color.red())
+            embed.add_field(name="Détails de l'erreur", value=f"Utilisateur : {interaction.user.name} ({interaction.user.id})\nServeur : {interaction.guild.name} ({interaction.guild.id})")
+            embed.add_field(name="Retour console", value=e[:1000])
             print(f"❌ Erreur dans la commande /register : {e}")
             await interaction.followup.send("Une erreur s'est produite lors de l'exécution de la commande.", ephemeral=False)
 
