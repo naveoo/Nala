@@ -1,12 +1,17 @@
 import discord
 from discord.ext import commands
 from discord import app_commands
+import os
 import random
 import string
 
 class GeneratePassword(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+
+        @commands.Cog.listener()
+        async def on_ready(self):
+            self.logs_channel = self.bot.get_channel(int(os.getenv("LOGS_CHANNEL")))
 
     @app_commands.command(name="generate_password", description="Génère un mot de passe aléatoire.")
     @app_commands.describe(length="Longueur du mot de passe souhaitée (minimum : 4)")
@@ -27,6 +32,9 @@ class GeneratePassword(commands.Cog):
             )
             await interaction.followup.send(embed=embed)
         except Exception as e:
+            embed = discord.Embed(title="Erreur dans /generate_password", description="Une erreur est apparue à l'éxecution de la commande", color=discord.Color.red())
+            embed.add_field(name="Détails de l'erreur", value=f"Utilisateur : {interaction.user.name} ({interaction.user.id})\nServeur : {interaction.guild.name} ({interaction.guild.id})")
+            embed.add_field(name="Retour console", value=e[:1000])
             print(f"❌ Erreur dans la commande /generate_password : {e}")
             await interaction.followup.send("Une erreur s'est produite lors de la génération du mot de passe.", ephemeral=True)
 
