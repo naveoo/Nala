@@ -16,6 +16,10 @@ class ListRepos(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.Cog.listener()
+    async def on_ready(self):
+        self.logs_channel = self.bot.get_channel(int(os.getenv("LOGS_CHANNEL")))
+        
     @app_commands.command(name="list_repos", description="Listez les dépôts GitHub auxquels vous pouvez vous inscrire.")
     async def list_repos(self, interaction: discord.Interaction):
         discord_id = str(interaction.user.id)

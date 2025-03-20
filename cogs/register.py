@@ -19,7 +19,11 @@ cursor = conn.cursor()
 class Register(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-
+    
+    @commands.Cog.listener()
+    async def on_ready(self):
+        self.logs_channel = self.bot.get_channel(int(os.getenv("LOGS_CHANNEL")))
+    
     @app_commands.command(name="register", description="Enregistrez-vous pour lier votre compte GitHub.")
     async def register(self, interaction: discord.Interaction):
         try:

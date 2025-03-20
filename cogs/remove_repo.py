@@ -18,6 +18,10 @@ class RemoveRepo(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.Cog.listener()
+    async def on_ready(self):
+        self.logs_channel = self.bot.get_channel(int(os.getenv("LOGS_CHANNEL")))
+    
     @app_commands.command(name="remove_repo", description="Retirez un dépôt GitHub de votre profil.")
     async def remove_repo(self, interaction: discord.Interaction, repo_name: str):
         discord_id = str(interaction.user.id)

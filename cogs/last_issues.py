@@ -12,6 +12,10 @@ class ListIssues(commands.Cog):
         self.bot = bot
         self.bot.get_channel(int(os.getenv("LOGS_CHANNEL")))
 
+    @commands.Cog.listener()
+    async def on_ready(self):
+        self.logs_channel = self.bot.get_channel(int(os.getenv("LOGS_CHANNEL")))
+    
     @app_commands.command(name="list_issues", description="Liste les 5 dernières issues ouvertes d'un dépôt GitHub.")
     @app_commands.describe(repo_name="Nom du dépôt GitHub (format : owner/repo)")
     async def list_issues(self, interaction: discord.Interaction, repo_name: str):

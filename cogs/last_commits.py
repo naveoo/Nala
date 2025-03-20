@@ -8,6 +8,10 @@ class LastCommits(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.Cog.listener()
+    async def on_ready(self):
+        self.logs_channel = self.bot.get_channel(int(os.getenv("LOGS_CHANNEL")))
+
     @app_commands.command(name="last_commits", description="Liste les derniers commits d'un dépôt GitHub.")
     @app_commands.describe(repo_name="Nom du dépôt GitHub (format : owner/repo)")
     async def last_commits(self, interaction: discord.Interaction, repo_name: str):
