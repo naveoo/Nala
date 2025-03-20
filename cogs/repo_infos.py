@@ -25,7 +25,7 @@ class RepoInfos(commands.Cog):
 
             collaborators = await self.get_collaborators(repo_name, github_token)
 
-            embed = discord.Embed(title=f"📋 Informations sur {repo_name}", color=discord.Color.green())
+            embed = discord.Embed(title=f"📋 Informations sur {repo_name}", color=discord.Color.blue())
             embed.add_field(name="Nom", value=repo_data.get("name", "Inconnu"), inline=False)
             embed.add_field(name="Description", value=repo_data.get("description", "Aucune"), inline=False)
             embed.add_field(name="Étoiles ⭐", value=repo_data.get("stargazers_count", 0), inline=True)
