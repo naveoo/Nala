@@ -30,6 +30,7 @@ def log_error(message):
 
 @bot.event
 async def on_ready():
+    await bot.change_presence(status=discord.Status.online, activity=discord.Game(name="/help"))
     log_info(f"{bot.user} est en ligne.")
     try:
         await bot.tree.sync()
