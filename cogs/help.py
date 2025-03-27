@@ -13,7 +13,7 @@ class Help(commands.Cog):
         embed = discord.Embed(
             title="📌 Liste des commandes utilisables",
             description="",
-            color=discord.Color.blue()
+            color=discord.Color.green()
         )
         embed.add_field(name="```Attention```", value="Plusieurs fonctionnalitées poussées du bot nécessitent une inscription préalable avec /register, il est donc vivement conseillé de s'inscrire avant toute utilisation.")
         embed.add_field(
@@ -28,9 +28,9 @@ class Help(commands.Cog):
                 " --- Issue ouverte\n"
                 " --- Nouveau Fork\n"
                 " --- Publication de release\n"
-                "`/remove_repo <utilisateur/dépôt>` • Permet d'enlever un dépôt à son profil et de réinitialiser les paramètres."
-                "`/last_commits <utilisateur/dépôt> • Permet d'afficher les 5 derniers commits sur un dépôt."
-                "`/last_issues <utilisateur/dépôt>` • Permet d'afficher les 5 dernières issues d'un dépôt."
+                "`/remove_repo <utilisateur/dépôt>` • Permet d'enlever un dépôt à son profil et de réinitialiser les paramètres.\n"
+                "`/last_commits <utilisateur/dépôt>` • Permet d'afficher les 5 derniers commits sur un dépôt.\n"
+                "`/last_issues <utilisateur/dépôt>` • Permet d'afficher les 5 dernières issues d'un dépôt.\n"
             ),
             inline=False
         )
@@ -38,7 +38,8 @@ class Help(commands.Cog):
             name="Autres",
             value=(
                 "`/generate_uuid` • Permet de générer une uuid (identifiant unique).\n"
-                "`/generate_uuid <longueur>` • Permet de générer un mot de passe aléatoire."
+                "`/generate_uuid <longueur>` • Permet de générer un mot de passe aléatoire.\n"
+                "`/get_documentation` • Donne le lien vers la documentations de plusieurs technologies.\n"
             ),
             inline=False
         )
