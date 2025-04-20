@@ -27,7 +27,6 @@ class GenerateUUID(commands.Cog):
             embed = discord.Embed(title="Erreur dans /generate_uuid", description="Une erreur est apparue à l'éxecution de la commande", color=discord.Color.red())
             embed.add_field(name="Détails de l'erreur", value=f"Utilisateur : {interaction.user.name} ({interaction.user.id})\nServeur : {interaction.guild.name} ({interaction.guild.id})")
             embed.add_field(name="Retour console", value=e[:1000])
-            print(f"❌ Erreur dans la commande /generate_uuid : {e}")
             await interaction.followup.send("Une erreur s'est produite lors de la génération de l'UUID.", ephemeral=True)
 
 async def setup(bot):

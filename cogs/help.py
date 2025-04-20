@@ -38,7 +38,7 @@ class Help(commands.Cog):
             name="Autres",
             value=(
                 "`/generate_uuid` • Permet de générer une uuid (identifiant unique).\n"
-                "`/generate_uuid <longueur>` • Permet de générer un mot de passe aléatoire.\n"
+                "`/generate_password <longueur>` • Permet de générer un mot de passe aléatoire.\n"
                 "`/get_documentation` • Donne le lien vers la documentations de plusieurs technologies.\n"
             ),
             inline=False
